@@ -81,11 +81,15 @@
   }
 
   .col {
-    float: left;
+    display: block;
 
     &.sample {
       width: 60px;
       margin-right: 30px;
+
+      .icon {
+          height: ($baseline * 1.5);
+      }
     }
   }
 
@@ -113,32 +117,4 @@
   height: 21px;
   vertical-align: middle;
   color: $base-font-color;
-
-    &.heading3 {
-
-    }
-
-    &.multiple-choice {
-
-    }
-
-    &.checks {
-
-    }
-
-    &.string {
-
-    }
-
-    &.number {
-
-    }
-
-    &.dropdown {
-
-    }
-
-    &.explanation {
-      
-    }
 }
