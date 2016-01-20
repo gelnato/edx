@@ -571,3 +571,6 @@ JWT_AUTH.update({
     'JWT_ISSUER': 'https://test-provider/oauth2',
     'JWT_AUDIENCE': 'test-key',
 })
+
+# Deprecated xblocks types
+DEPRECATED_ADVANCED_COMPONENT_TYPES = []
