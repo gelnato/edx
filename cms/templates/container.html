@@ -9,7 +9,7 @@ else:
 </%def>
 <%!
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
-from openedx.core.djangolib.js_utils import escape_jsoon_for_js
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from util.markup import HTML, ugettext as _
 %>
 <%block name="title">${xblock.display_name_with_default_escaped} ${xblock_type_display_name(xblock) | h}</%block>
@@ -32,11 +32,11 @@ from util.markup import HTML, ugettext as _
 <%block name="requirejs">
     require(["js/factories/container"], function(ContainerFactory) {
         ContainerFactory(
-            ${component_templates | n,escape_jsoon_for_js},
-            ${xblock_info | n,escape_jsoon_for_js},
+            ${component_templates | n, dump_js_escaped_json},
+            ${xblock_info | n, dump_js_escaped_json},
             "${action | h}",
             {
-                isUnitPage: ${is_unit_page | n,escape_jsoon_for_js},
+                isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
                 canEdit: true
             }
         );

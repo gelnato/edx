@@ -9,7 +9,7 @@ import HTMLParser
 from mako.template import Template
 
 from openedx.core.djangolib.js_utils import (
-    escape_jsoon_for_js, escape_jsoon_for_html, escape_string_for_js
+    dump_js_escaped_json, dump_html_escaped_json, js_escaped_string
 )
 
 
@@ -33,28 +33,28 @@ class TestJSUtils(TestCase):
         def default(self, noDefaultEncodingObj):
             return noDefaultEncodingObj.value.replace("<script>", "sample-encoder-was-here")
 
-    def test_escape_jsoon_for_js_escapes_unsafe_html(self):
+    def test_dump_js_escaped_json_escapes_unsafe_html(self):
         """
-        Test escape_jsoon_for_js properly escapes &, <, and >.
+        Test dump_js_escaped_json properly escapes &, <, and >.
         """
-        malicious_jsoon = {"</script><script>alert('hello, ');</script>": "</script><script>alert('&world!');</script>"}
+        malicious_dict = {"</script><script>alert('hello, ');</script>": "</script><script>alert('&world!');</script>"}
         expected_escaped_json = (
             r'''{"\u003c/script\u003e\u003cscript\u003ealert('hello, ');\u003c/script\u003e": '''
             r'''"\u003c/script\u003e\u003cscript\u003ealert('\u0026world!');\u003c/script\u003e"}'''
         )
 
-        escaped_json = escape_jsoon_for_js(malicious_jsoon)
+        escaped_json = dump_js_escaped_json(malicious_dict)
         self.assertEquals(expected_escaped_json, escaped_json)
 
-    def test_escape_jsoon_for_js_with_custom_encoder_escapes_unsafe_html(self):
+    def test_dump_js_escaped_json_with_custom_encoder_escapes_unsafe_html(self):
         """
-        Test escape_jsoon_for_js first encodes with custom JSNOEncoder before escaping &, <, and >
+        Test dump_js_escaped_json first encodes with custom JSNOEncoder before escaping &, <, and >
 
         The test encoder class should first perform the replacement of "<script>" with
         "sample-encoder-was-here", and then should escape the remaining &, <, and >.
 
         """
-        malicious_jsoon = {
+        malicious_dict = {
             "</script><script>alert('hello, ');</script>":
             self.NoDefaultEncoding("</script><script>alert('&world!');</script>")
         }
@@ -63,31 +63,31 @@ class TestJSUtils(TestCase):
             r'''"\u003c/script\u003esample-encoder-was-herealert('\u0026world!');\u003c/script\u003e"}'''
         )
 
-        escaped_json = escape_jsoon_for_js(malicious_jsoon, cls=self.SampleJSONEncoder)
+        escaped_json = dump_js_escaped_json(malicious_dict, cls=self.SampleJSONEncoder)
         self.assertEquals(expected_custom_escaped_json, escaped_json)
 
-    def test_escape_jsoon_for_html_escapes_unsafe_html(self):
+    def test_dump_html_escaped_json_escapes_unsafe_html(self):
         """
-        Test escape_jsoon_for_html properly escapes &, <, and >.
+        Test dump_html_escaped_json properly escapes &, <, and >.
         """
-        malicious_jsoon = {"</script><script>alert('hello, ');</script>": "</script><script>alert('&world!');</script>"}
+        malicious_dict = {"</script><script>alert('hello, ');</script>": "</script><script>alert('&world!');</script>"}
         expected_escaped_json = (
             "{&#34;&lt;/script&gt;&lt;script&gt;alert(&#39;hello, &#39;);&lt;/script&gt;&#34;: "
             "&#34;&lt;/script&gt;&lt;script&gt;alert(&#39;&amp;world!&#39;);&lt;/script&gt;&#34;}"
         )
 
-        escaped_json = escape_jsoon_for_html(malicious_jsoon)
+        escaped_json = dump_html_escaped_json(malicious_dict)
         self.assertEquals(expected_escaped_json, escaped_json)
 
-    def test_escape_jsoon_for_html_with_custom_encoder_escapes_unsafe_html(self):
+    def test_dump_html_escaped_json_with_custom_encoder_escapes_unsafe_html(self):
         """
-        Test escape_jsoon_for_html first encodes with custom JSNOEncoder before escaping &, <, and >
+        Test dump_html_escaped_json first encodes with custom JSNOEncoder before escaping &, <, and >
 
         The test encoder class should first perform the replacement of "<script>" with
         "sample-encoder-was-here", and then should escape the remaining &, <, and >.
 
         """
-        malicious_jsoon = {
+        malicious_dict = {
             "</script><script>alert('hello, ');</script>":
             self.NoDefaultEncoding("</script><script>alert('&world!');</script>")
         }
@@ -95,19 +95,19 @@ class TestJSUtils(TestCase):
             "{&#34;&lt;/script&gt;&lt;script&gt;alert(&#39;hello, &#39;);&lt;/script&gt;&#34;: "
             "&#34;&lt;/script&gt;sample-encoder-was-herealert(&#39;&amp;world!&#39;);&lt;/script&gt;&#34;}"
         )
-        escaped_json = escape_jsoon_for_html(malicious_jsoon, cls=self.SampleJSONEncoder)
+        escaped_json = dump_html_escaped_json(malicious_dict, cls=self.SampleJSONEncoder)
         self.assertEquals(expected_custom_escaped_json, escaped_json)
 
-    def test_escape_string_for_js_escapes_unsafe_html(self):
+    def test_js_escaped_string_escapes_unsafe_html(self):
         """
-        Test escape_string_for_js escapes &, <, and >, as well as returns a unicode type
+        Test js_escaped_string escapes &, <, and >, as well as returns a unicode type
         """
         malicious_js_string = "</script><script>alert('hello, ');</script>"
 
         expected_escaped_string_for_js = unicode(
             r"\u003C/script\u003E\u003Cscript\u003Ealert(\u0027hello, \u0027)\u003B\u003C/script\u003E"
         )
-        escaped_string_for_js = escape_string_for_js(malicious_js_string)
+        escaped_string_for_js = js_escaped_string(malicious_js_string)
         self.assertEquals(expected_escaped_string_for_js, escaped_string_for_js)
 
     def test_mako(self):
@@ -131,24 +131,24 @@ class TestJSUtils(TestCase):
             """
                 <%!
                 from openedx.core.djangolib.js_utils import (
-                    escape_jsoon_for_js, escape_jsoon_for_html, escape_string_for_js
+                    dump_js_escaped_json, dump_html_escaped_json, js_escaped_string
                 )
                 %>
                 <body>
                     <div
-                        data-test-dict='${test_dict | n,escape_jsoon_for_html}'
+                        data-test-dict='${test_dict | n, dump_html_escaped_json}'
                         data-test-string='${test_dict["test_string"]}'
-                        data-test-tuple='${test_dict["test_tuple"] | n,escape_jsoon_for_html}'
-                        data-test-number='${test_dict["test_number"] | n,escape_jsoon_for_html}'
-                        data-test-bool='${test_dict["test_bool"] | n,escape_jsoon_for_html}'
+                        data-test-tuple='${test_dict["test_tuple"] | n, dump_html_escaped_json}'
+                        data-test-number='${test_dict["test_number"] | n, dump_html_escaped_json}'
+                        data-test-bool='${test_dict["test_bool"] | n, dump_html_escaped_json}'
                     ></div>
 
                     <script>
-                        var test_dict = ${test_dict | n,escape_jsoon_for_js}
-                        var test_string = '${test_dict["test_string"] | n,escape_string_for_js}'
-                        var test_tuple = ${test_dict["test_tuple"] | n,escape_jsoon_for_js}
-                        var test_number = ${test_dict["test_number"] | n,escape_jsoon_for_js}
-                        var test_bool = ${test_dict["test_bool"] | n,escape_jsoon_for_js}
+                        var test_dict = ${test_dict | n, dump_js_escaped_json}
+                        var test_string = '${test_dict["test_string"] | n, js_escaped_string}'
+                        var test_tuple = ${test_dict["test_tuple"] | n, dump_js_escaped_json}
+                        var test_number = ${test_dict["test_number"] | n, dump_js_escaped_json}
+                        var test_bool = ${test_dict["test_bool"] | n, dump_js_escaped_json}
                     </script>
                 </body>
             """,

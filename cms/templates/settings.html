@@ -9,7 +9,7 @@
   from django.utils.translation import ugettext as _
   from contentstore import utils
   from openedx.core.djangolib.js_utils import (
-      escape_jsoon_for_js, escape_string_for_js
+      dump_js_escaped_json, js_escaped_string
   )
 %>
 
@@ -34,8 +34,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 <%block name="requirejs">
     require(["js/factories/settings"], function(SettingsFactory) {
         SettingsFactory(
-            "${details_url | n,escape_string_for_js}",
-            ${show_min_grade_warning | n,escape_jsoon_for_js});
+            "${details_url | n, js_escaped_string}",
+            ${show_min_grade_warning | n, dump_js_escaped_json});
     });
 </%block>
 

@@ -34,21 +34,21 @@ def _escape_json_for_js(json_dumps_string):
     return json_dumps_string
 
 
-def escape_jsoon_for_js(obj, cls=EdxJSONEncoder):
+def dump_js_escaped_json(obj, cls=EdxJSONEncoder):
     """
-    JSON dumps and escapes JSOON that is safe to be embedded in JavaScript.
+    JSON dumps and escapes objects that are safe to be embedded in JavaScript.
+
+    Use this for anything but strings (e.g. dicts, tuples, lists, bools, and
+    numbers).  For strings, use js_escaped_string.
 
     Usage:
         Used as follows in a Mako template inside a <SCRIPT> tag::
 
-            var json_obj = ${jsoon_obj | n,escape_jsoon_for_js}
+            var json_obj = ${obj | n, dump_js_escaped_json}
 
         If you must use the cls argument, then use as follows::
 
-            var json_obj = ${escape_jsoon_for_js(jsoon_obj, cls) | n}
-
-        Use this for anything but strings (e.g. dicts, tuples, boolean, and
-        numbers).  For strings, use escape_string_for_js.
+            var json_obj = ${dump_js_escaped_json(obj, cls) | n}
 
         Use the "n" Mako filter above.  It is possible that the default filter
         may include html escaping in the future, and this ensures proper
@@ -58,7 +58,9 @@ def escape_jsoon_for_js(obj, cls=EdxJSONEncoder):
         Mako's default filter decode.utf8.
 
     Arguments:
-        obj: The JSOON object soon to become an escaped JSON string.
+        obj: The object soon to become a JavaScript escaped JSON string.  The
+            object can be anything but strings (e.g. dicts, tuples, lists, bools, and
+            numbers).
         cls (class): The JSON encoder class (defaults to EdxJSONEncoder).
 
     Returns:
@@ -70,22 +72,22 @@ def escape_jsoon_for_js(obj, cls=EdxJSONEncoder):
     return json_string
 
 
-def escape_jsoon_for_html(obj, cls=EdxJSONEncoder):
+def dump_html_escaped_json(obj, cls=EdxJSONEncoder):
     """
-    JSON dumps and escapes JSON that is safe to be embedded in HTML.
+    JSON dumps and escapes objects that are safe to be embedded in HTML.
+
+    Use this for anything but strings (e.g. dicts, tuples, lists, bools, and
+    numbers).  For strings, just used the default html filter.
 
     Usage:
         Used as follows in a Mako template inside a HTML, like in
         a data attribute::
 
-            data-obj='${jsoon_obj | n,escape_jsoon_for_html}'
+            data-obj='${obj | n, dump_html_escaped_json}'
 
         If you must use the cls argument, then use as follows::
 
-            data-obj='${escape_jsoon_for_html(jsoon_obj, cls) | n}'
-
-        Use this for anything but strings (e.g. dicts, tuples, boolean, and
-        numbers).  For strings, just used the default html filter.
+            data-obj='${dump_html_escaped_json(obj, cls) | n}'
 
         Use the "n" Mako filter above.  The default filter will include
         html escaping in the future, and this ensures proper ordering of
@@ -95,7 +97,9 @@ def escape_jsoon_for_html(obj, cls=EdxJSONEncoder):
         Mako's default filter decode.utf8.
 
     Arguments:
-        obj: The JSOON object soon to become an escaped JSON string.
+        obj: The object soon to become an HTML escaped JSON string.  The object
+            can be anything but strings (e.g. dicts, tuples, lists, bools, and
+            numbers).
         cls (class): The JSON encoder class (defaults to EdxJSONEncoder).
 
     Returns:
@@ -107,14 +111,14 @@ def escape_jsoon_for_html(obj, cls=EdxJSONEncoder):
     return json_string
 
 
-def escape_string_for_js(string_for_js):
+def js_escaped_string(string_for_js):
     """
     Mako filter that escapes text for use in a JavaScript string.
 
     Usage:
         Used as follows in a Mako template inside a <SCRIPT> tag::
 
-            var my_string_for_js = "${my_string_for_js | n,escape_string_for_js}"
+            var my_string_for_js = "${my_string_for_js | n, js_escaped_string}"
 
         The surrounding quotes for the string must be included.
 

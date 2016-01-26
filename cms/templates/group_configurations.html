@@ -6,7 +6,7 @@
 from contentstore import utils
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import (
-    escape_jsoon_for_js, escape_string_for_js
+    dump_js_escaped_json, js_escaped_string
 )
 %>
 
@@ -24,11 +24,11 @@ from openedx.core.djangolib.js_utils import (
 <%block name="requirejs">
   require(["js/factories/group_configurations"], function(GroupConfigurationsFactory) {
       GroupConfigurationsFactory(
-          ${should_show_experiment_groups | n,escape_jsoon_for_js},
-          ${experiment_group_configurations | n,escape_jsoon_for_js},
-          ${content_group_configuration | n,escape_jsoon_for_js},
-          "${group_configuration_url | n,escape_string_for_js}",
-          "${course_outline_url | n,escape_string_for_js}"
+          ${should_show_experiment_groups | n, dump_js_escaped_json},
+          ${experiment_group_configurations | n, dump_js_escaped_json},
+          ${content_group_configuration | n, dump_js_escaped_json},
+          "${group_configuration_url | n, js_escaped_string}",
+          "${course_outline_url | n, js_escaped_string}"
       );
   });
 </%block>
