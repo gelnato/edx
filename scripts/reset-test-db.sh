@@ -42,42 +42,64 @@ for db in "${!databases[@]}"; do
     ./manage.py lms --settings bok_choy reset_db --traceback --noinput --router $db
 
     # If there are cached database schemas/data, load them
-    if [[ -f $DB_CACHE_DIR/bok_choy_schema_$db.sql && -f $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql && -f $DB_CACHE_DIR/bok_choy_data_$db.json ]]; then
+    if [[ ! -f $DB_CACHE_DIR/bok_choy_schema_$db.sql || ! -f $DB_CACHE_DIR/bok_choy_data_$db.json ]]; then
+        echo "Missing $DB_CACHE_DIR/bok_choy_schema_$db.sql or $DB_CACHE_DIR/bok_choy_data_$db.json, rebuilding cache"
+        REBUILD_CACHE=true
+    fi
 
-        echo "Found the bok_choy DB cache files. Loading them into the database..."
+done
+
+# migrations are only stored in the default database
+if [[ ! -f $DB_CACHE_DIR/bok_choy_migrations_data.sql ]]; then
+    REBUILD_CACHE=true
+fi
+
+
+
+# If there are cached database schemas/data, load them
+if [[ -z $REBUILD_CACHE ]]; then
+
+    echo "Found the bok_choy DB cache files. Loading them into the database..."
+
+    for db in "${!databases[@]}"; do
         # Load the schema, then the data (including the migration history)
         echo "Loading the schema from the filesystem into the MySQL DB."
-        mysql -u root "${databases[$db]}" < $DB_CACHE_DIR/bok_choy_schema_$db.sql
-        echo "Loading the migration data from the filesystem into the MySQL DB."
-        mysql -u root "${databases[$db]}" < $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
+        mysql -u root "${databases["$db"]}" < $DB_CACHE_DIR/bok_choy_schema_$db.sql
         echo "Loading the fixture data from the filesystem into the MySQL DB."
         ./manage.py lms --settings bok_choy loaddata --database $db $DB_CACHE_DIR/bok_choy_data_$db.json
+    done
 
-        # Re-run migrations to ensure we are up-to-date
-        echo "Running the lms migrations on the bok_choy DB."
-        ./manage.py lms --settings bok_choy migrate --traceback --noinput
-        echo "Running the cms migrations on the bok_choy DB."
-        ./manage.py cms --settings bok_choy migrate --traceback --noinput
+    # Migrations are stored in the default database
+    echo "Loading the migration data from the filesystem into the MySQL DB."
+    mysql -u root "${databases['default']}" < $DB_CACHE_DIR/bok_choy_migrations_data.sql
 
-    # Otherwise, update the test database and update the cache
-    else
-        echo "Did not find a bok_choy DB cache. Creating a new one from scratch."
-        # Clean the cache directory
-        rm -rf $DB_CACHE_DIR && mkdir -p $DB_CACHE_DIR
+    # Re-run migrations to ensure we are up-to-date
+    echo "Running the lms migrations on the bok_choy DB."
+    ./manage.py lms --settings bok_choy migrate --traceback --noinput
+    echo "Running the cms migrations on the bok_choy DB."
+    ./manage.py cms --settings bok_choy migrate --traceback --noinput
 
-        # Re-run migrations on the test database
-        echo "Issuing a migrate command to the bok_choy MySQL database for the lms django apps."
-        ./manage.py lms --settings bok_choy migrate --traceback --noinput
-        echo "Issuing a migrate command to the bok_choy MySQL database for the cms django apps."
-        ./manage.py cms --settings bok_choy migrate --traceback --noinput
+# Otherwise, update the test database and update the cache
+else
+    echo "Did not find a bok_choy DB cache. Creating a new one from scratch."
+    # Clean the cache directory
+    rm -rf $DB_CACHE_DIR && mkdir -p $DB_CACHE_DIR
 
+    # Re-run migrations on the test database
+    echo "Issuing a migrate command to the bok_choy MySQL database for the lms django apps."
+    ./manage.py lms --settings bok_choy migrate --traceback --noinput
+    echo "Issuing a migrate command to the bok_choy MySQL database for the cms django apps."
+    ./manage.py cms --settings bok_choy migrate --traceback --noinput
+
+    for db in "${!databases[@]}"; do
         # Dump the schema and data to the cache
         echo "Using the dumpdata command to save the fixture data to the filesystem."
         ./manage.py lms --settings bok_choy dumpdata --database $db > $DB_CACHE_DIR/bok_choy_data_$db.json
-        # dump_data does not dump the django_migrations table so we do it separately.
-        echo "Saving the django_migrations table of the bok_choy DB to the filesystem."
-        mysqldump -u root --no-create-info "${databases[$db]}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
         echo "Saving the schema of the bok_choy DB to the filesystem."
         mysqldump -u root --no-data --skip-comments --skip-dump-date "${databases[$db]}" > $DB_CACHE_DIR/bok_choy_schema_$db.sql
-    fi
-done
+    done
+
+    # dump_data does not dump the django_migrations table so we do it separately.
+    echo "Saving the django_migrations table of the bok_choy DB to the filesystem."
+    mysqldump -u root --no-create-info "${databases['default']}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data.sql
+fi

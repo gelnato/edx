@@ -9,22 +9,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-DROP TABLE IF EXISTS `courseware_studentmodulehistory`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `courseware_studentmodulehistory` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `course_key` varchar(255) NOT NULL,
-  `usage_key` varchar(255) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `version` varchar(255) DEFAULT NULL,
-  `created` datetime NOT NULL,
-  `state` longtext,
-  `grade` double DEFAULT NULL,
-  `max_grade` double DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
