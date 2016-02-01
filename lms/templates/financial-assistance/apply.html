@@ -13,7 +13,7 @@ from openedx.core.djangolib.js_utils import (
 FinancialAssistanceFactory({
     fields: ${fields | n, dump_js_escaped_json},
     user_details: ${user_details | n, dump_js_escaped_json},
-    header_text: '${header_text | n, js_escaped_string}',
+    header_text: ${header_text | n, dump_js_escaped_json},
     student_faq_url: '${student_faq_url | n, js_escaped_string}',
     dashboard_url: '${dashboard_url | n, js_escaped_string}',
     account_settings_url: '${account_settings_url | n, js_escaped_string}',

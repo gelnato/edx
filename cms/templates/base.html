@@ -85,7 +85,7 @@ from openedx.core.djangolib.js_utils import (
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
-                      display_course_number: "${_(context_course.display_coursenumber) if context_course.display_coursenumber else ''}",
+                      display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
                       revision: "${context_course.location.revision | h}",
                       self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
                   });

@@ -27,10 +27,10 @@ else:
 <%block name="requirejs">
 % if in_err:
   var hasUnit = ${bool(unit) | n, dump_js_escaped_json},
-      editUnitUrl = "${edit_unit_url or "" | n, js_escaped_string}",
-      courselikeHomeUrl = "${courselike_home_url or "" | n, js_escaped_string}",
+      editUnitUrl = "${edit_unit_url | n, js_escaped_string}",
+      courselikeHomeUrl = "${courselike_home_url | n, js_escaped_string}",
       is_library = ${library | n, dump_js_escaped_json}
-      errMsg = "${raw_err_msg or "" | n, js_escaped_string}";
+      errMsg = "${raw_err_msg | n, js_escaped_string}";
 
   require(["js/factories/export"], function(ExportFactory) {
       ExportFactory(hasUnit, editUnitUrl, courselikeHomeUrl, is_library, errMsg);

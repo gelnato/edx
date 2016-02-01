@@ -38,9 +38,9 @@ CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
               "${certificate_url | n, js_escaped_string}",
               "${course_outline_url | n, js_escaped_string}",
               ${course_modes | n, dump_js_escaped_json},
-              "${certificate_web_view_url | n, js_escaped_string}",
+              ${certificate_web_view_url | n, dump_js_escaped_json},
               ${is_active | n, dump_js_escaped_json},
-              "${certificate_activation_handler_url | n, js_escaped_string}"
+              ${certificate_activation_handler_url | n, dump_js_escaped_json}
           );
       }
   });

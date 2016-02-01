@@ -110,6 +110,13 @@ class TestJSUtils(TestCase):
         escaped_string_for_js = js_escaped_string(malicious_js_string)
         self.assertEquals(expected_escaped_string_for_js, escaped_string_for_js)
 
+    def test_js_escaped_string_with_none(self):
+        """
+        Test js_escaped_string returns empty string for None
+        """
+        escaped_string_for_js = js_escaped_string(None)
+        self.assertEquals(u"", escaped_string_for_js)
+
     def test_mako(self):
         """
         Tests the full suite of Mako best practices by running all of the
@@ -146,9 +153,11 @@ class TestJSUtils(TestCase):
                     <script>
                         var test_dict = ${test_dict | n, dump_js_escaped_json}
                         var test_string = '${test_dict["test_string"] | n, js_escaped_string}'
+                        var test_none_string = '${None | n, js_escaped_string}'
                         var test_tuple = ${test_dict["test_tuple"] | n, dump_js_escaped_json}
                         var test_number = ${test_dict["test_number"] | n, dump_js_escaped_json}
                         var test_bool = ${test_dict["test_bool"] | n, dump_js_escaped_json}
+                        var test_none_json = ${None | n, dump_js_escaped_json}
                     </script>
                 </body>
             """,
@@ -180,9 +189,11 @@ class TestJSUtils(TestCase):
         self.assertIn(
             "var test_string = '" + expected_string_for_js.decode(encoding='utf-8') + "'",
             out)
+        self.assertIn("var test_none_string = ''", out)
         self.assertIn("var test_tuple = [1, 2, 3]", out)
         self.assertIn("var test_number = 3.5", out)
         self.assertIn("var test_bool = false", out)
+        self.assertIn("var test_none_json = null", out)
 
     def _validate_expectation_of_json_for_html(self, test_dict, expected_json_for_html_string):
         """
