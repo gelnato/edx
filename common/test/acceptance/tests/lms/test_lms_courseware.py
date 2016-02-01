@@ -106,23 +106,6 @@ class CoursewareTest(UniqueCourseTest):
         # Problem name should be "TEST PROBLEM 2".
         self.assertEqual(self.problem_page.problem_name, 'TEST PROBLEM 2')
 
-    def test_course_tree_breadcrumb(self):
-        """
-        Scenario: Correct course tree breadcrumb is shown.
-
-        Given that I am a registered user
-        And I visit my courseware page
-        Then I should see correct course tree breadcrumb
-        """
-        self.courseware_page.visit()
-
-        xblocks = self.course_fix.get_nested_xblocks(category="problem")
-        for index in range(1, len(xblocks) + 1):
-            self.course_nav.go_to_section('Test Section {}'.format(index), 'Test Subsection {}'.format(index))
-            courseware_page_breadcrumb = self.courseware_page.breadcrumb
-            expected_breadcrumb = self._create_breadcrumb(index)  # pylint: disable=no-member
-            self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
-
 
 class ProctoredExamTest(UniqueCourseTest):
     """
