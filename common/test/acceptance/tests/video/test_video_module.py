@@ -633,11 +633,11 @@ class YouTubeVideoTest(VideoBaseTest):
         And videos "E,F" in "Youtube" mode in position "2" of sequential
         """
         self.verticals = [
-            [{'display_name': 'a'}, {'display_name': 'b'}], [{'display_name': 'c'}, {'display_name': 'd'}]
+            [{'display_name': 'A'}, {'display_name': 'B'}], [{'display_name': 'C'}, {'display_name': 'D'}]
         ]
 
-        tab1_video_names = ['a', 'b']
-        tab2_video_names = ['c', 'd']
+        tab1_video_names = ['A', 'B']
+        tab2_video_names = ['C', 'D']
 
         def execute_video_steps(video_names):
             """
