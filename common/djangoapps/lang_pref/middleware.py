@@ -28,13 +28,13 @@ class LanguagePreferenceMiddleware(object):
             # Set it to the LANGUAGE_SESSION_KEY (Django-specific session setting governing language pref)
             if user_pref:
                 request.session[LANGUAGE_SESSION_KEY] = user_pref
-            else:
-                # Setting the session language to the browser language, if it is supported.
-                preferred_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-                lang_headers = [seq[0] for seq in parse_accept_lang_header(preferred_language)]
-                languages = released_languages()
-                for browser_lang in lang_headers:
-                    if browser_lang in [seq[0] for seq in languages]:
-                        if request.session.get(LANGUAGE_SESSION_KEY, None) != browser_lang:
-                            request.session[LANGUAGE_SESSION_KEY] = unicode(browser_lang)
-                        break
+        else:
+            # Setting the session language to the browser language, if it is supported.
+            preferred_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+            lang_headers = [seq[0] for seq in parse_accept_lang_header(preferred_language)]
+            languages = released_languages()
+            for browser_lang in lang_headers:
+                if browser_lang in [seq[0] for seq in languages]:
+                    if request.session.get(LANGUAGE_SESSION_KEY, None) is None:
+                        request.session[LANGUAGE_SESSION_KEY] = unicode(browser_lang)
+                    break
