@@ -6,7 +6,6 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from lang_pref import LANGUAGE_KEY
-from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 
 
