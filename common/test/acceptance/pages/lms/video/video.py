@@ -14,7 +14,7 @@ import logging
 log = logging.getLogger('VideoPage')
 
 VIDEO_BUTTONS = {
-    'transcript': '.lang',
+    'transcript': '.language-menu',
     'transcript_button': '.toggle-transcript',
     'cc_button': '.toggle-captions',
     'volume': '.volume',
@@ -631,7 +631,6 @@ class VideoPage(PageObject):
 
         language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(language_selector)
-
         self.wait_for_element_visibility(language_selector, 'language menu is visible')
         self.q(css=language_selector).first.click()
 
